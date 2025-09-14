@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSTs Paid Course By Imran Ustad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .header-footer {
+            background-color: #10B981; /* Tailwind green-500 */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 1rem;
+        }
+        .question-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 250px;
+        }
+        .question-card h3 {
+            color: #EF4444; /* Tailwind red-500 */
+            font-weight: bold;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.75rem;
+            border: 2px solid #D1D5DB; /* Tailwind gray-300 */
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .option-label:hover {
+            background-color: #F3F4F6;
+        }
+        input[type="radio"] {
+            margin-right: 0.75rem;
+            appearance: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid #6B7280; /* Tailwind gray-500 */
+            border-radius: 50%;
+            transition: all 0.2s ease-in-out;
+            flex-shrink: 0;
+        }
+        input[type="radio"]:checked {
+            background-color: #6B7280;
+            border-color: #6B7280;
+        }
+        .correct-answer-label {
+            background-color: #10B981 !important; /* Tailwind green-500 */
+            color: white !important;
+            border-color: #10B981 !important;
+        }
+        .incorrect-answer-label {
+            background-color: #EF4444 !important; /* Tailwind red-500 */
+            color: white !important;
+            border-color: #EF4444 !important;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .results-container {
+            max-width: 900px;
+            margin: auto;
+            padding: 1rem;
+        }
+        .download-card-container {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+            background-color: #f3f4f6;
+        }
+        .download-card {
+            width: 400px;
+            height: 600px;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-image: url('https://placehold.co/400x600/E8F5E9/000000?text=Result+Card');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-footer">
+        <h1 class="text-2xl">SSTs Paid Course By Imran Ustad</h1>
+        <div class="mt-2 text-sm">
+            WhatsApp: 03345501369 | YouTube: Imran Ustad
+        </div>
+    </header>
+
+    <!-- Name Prompt Modal -->
+    <div id="name-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Please enter your name</h2>
+            <form id="name-form" class="space-y-4">
+                <input type="text" id="user-name-input" required placeholder="Your Name" class="w-full px-4 py-2 border rounded-md">
+                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 rounded-md hover:bg-green-600">Start the Test</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <main id="quiz-screen" class="hidden">
+        <div class="quiz-container">
+            <!-- Live Status & Timer -->
+            <div class="bg-white rounded-lg p-4 mb-4 shadow-md">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="font-bold text-lg" id="timer-display">00:00</div>
+                    <div class="font-bold text-lg" id="status-display">Total Questions: 0 | Attempted: 0</div>
+                </div>
+                <div id="aria-live-feedback" aria-live="polite" class="sr-only"></div>
+                <div class="text-sm text-gray-500">
+                    <p>Note: Once you select an option for a question, you cannot change it. To change any answer you must reload the page.</p>
+                </div>
+            </div>
+
+            <!-- Quiz Questions Container -->
+            <div id="questions-container" class="space-y-4">
+                <!-- Single question will be dynamically inserted here -->
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between my-8">
+                <button id="prev-button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all">Previous</button>
+                <button id="next-button" class="bg-blue-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">Next</button>
+            </div>
+            
+            <!-- Submit Button (Hidden until the last question) -->
+            <div class="flex justify-center my-8">
+                <button id="submit-button" class="bg-green-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all hidden">Submit</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Results Screen -->
+    <main id="results-screen" class="hidden">
+        <div class="results-container">
+            <h2 class="text-3xl font-bold text-center mt-8 mb-4">Test Results</h2>
+            <div class="bg-white rounded-lg p-6 mb-8 shadow-md text-center">
+                <div class="text-xl">Student: <span id="result-name" class="font-bold"></span></div>
+                <div class="text-2xl mt-2">Your Score: <span id="result-score" class="font-bold"></span></div>
+            </div>
+
+            <div id="all-questions-results">
+                <!-- Detailed results will be dynamically inserted here -->
+            </div>
+
+            <div class="flex justify-center my-8 space-x-4">
+                <button id="download-button" class="bg-green-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-green-600 transition-all">Download Result Card</button>
+                <button id="print-button" class="bg-blue-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-600 transition-all">Print PDF</button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Popup for incomplete attempt -->
+    <div id="popup-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Incomplete!</h2>
+            <p class="mb-4">Attempt all the questions first.</p>
+            <button id="popup-close-button" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-md">OK</button>
+        </div>
+    </div>
+
+    <!-- Hidden element for PNG card rendering -->
+    <div id="download-card-render-container" class="hidden">
+        <div id="download-card" class="download-card">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-800">SSTs Paid Course By Imran Ustad</h1>
+                <div class="mt-1 text-sm text-gray-600">
+                    WhatsApp: 03345501369 | YouTube: Imran Ustad
+                </div>
+            </div>
+            <div class="flex-grow flex flex-col justify-center items-center text-center">
+                <h2 class="text-2xl font-bold text-gray-800">Result Card</h2>
+                <div class="text-xl mt-4 font-semibold text-gray-700">Student: <span id="card-name"></span></div>
+                <div class="text-3xl mt-2 font-bold text-green-700">Score: <span id="card-score"></span></div>
+            </div>
+            <div class="text-center text-gray-500 text-xs">
+                <span id="card-date"></span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="header-footer">
+        <h1 class="text-2xl">SSTs Paid Course By Imran Ustad</h1>
+        <div class="mt-2 text-sm">
+            WhatsApp: 03345501369 | YouTube: Imran Ustad
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Sample Quiz Data (dynamic and can be expanded)
+            const quizData = [
+                {
+                    id: 1,
+                    question: "Choose the correct sentence: They goes to the park every day.",
+                    options: ["They goes to the park every day.", "They go to the park every day.", "They going to the park every day.", "They went to the park every day."],
+                    correctIndex: 1,
+                    explanation: "Correct. The correct form for the present tense with the pronoun 'they' is 'go'.",
+                    wrongExplanation: "Incorrect. The verb 'goes' is used for singular subjects (he, she, it). For 'they', the correct verb is 'go'."
+                },
+                {
+                    id: 2,
+                    question: "The dog wagged ___ tail happily.",
+                    options: ["its", "it's", "it", "their"],
+                    correctIndex: 0,
+                    explanation: "Correct. The possessive pronoun for an animal is 'its'.",
+                    wrongExplanation: "Incorrect. 'It's' is a contraction of 'it is' or 'it has'. 'Its' is the correct possessive pronoun."
+                },
+                {
+                    id: 3,
+                    question: "She is the student ___ won the first prize.",
+                    options: ["who", "which", "whom", "whose"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Who' is used to refer to people.",
+                    wrongExplanation: "Incorrect. 'Which' is used for things, 'whom' for the object of a verb, and 'whose' for possession. 'Who' is the correct subject pronoun for a person."
+                },
+                {
+                    id: 4,
+                    question: "We have ___ apples left in the basket.",
+                    options: ["many", "much", "a lot", "few"],
+                    correctIndex: 3,
+                    explanation: "Correct. 'Few' is used with countable nouns like 'apples'.",
+                    wrongExplanation: "Incorrect. 'Much' is used with uncountable nouns. 'Many' is technically correct, but 'few' is a better fit to describe a small, remaining quantity."
+                },
+                {
+                    id: 5,
+                    question: "They ___ not finished their homework yet.",
+                    options: ["have", "has", "are", "do"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Have' is the correct auxiliary verb for the present perfect tense with the subject 'they'.",
+                    wrongExplanation: "Incorrect. 'Has' is used for singular subjects (he, she, it). 'Are' and 'do' are not used in this tense construction."
+                },
+                {
+                    id: 6,
+                    question: "He is a very ___ person.",
+                    options: ["tall", "taller", "tallest", "tallly"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Tall' is a simple adjective used to describe a noun.",
+                    wrongExplanation: "Incorrect. 'Taller' is a comparative adjective, and 'tallest' is a superlative adjective."
+                },
+                {
+                    id: 7,
+                    question: "___ you like some tea?",
+                    options: ["Would", "Do", "Can", "Are"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Would' is used to make a polite offer.",
+                    wrongExplanation: "Incorrect. 'Do' is used for a general question. 'Can' and 'are' do not fit the context of an offer."
+                },
+                {
+                    id: 8,
+                    question: "I am going ___ the store.",
+                    options: ["to", "at", "in", "on"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'To' is used to indicate a direction or destination.",
+                    wrongExplanation: "Incorrect. 'At' indicates a specific location, 'in' indicates inside, and 'on' indicates a surface."
+                },
+                {
+                    id: 9,
+                    question: "The sun ___ in the east.",
+                    options: ["rise", "rises", "is rising", "rose"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Rises' is the correct verb form for a singular subject ('the sun') in the simple present tense, used for a general truth.",
+                    wrongExplanation: "Incorrect. 'Rise' is the base form. 'Is rising' is present continuous. 'Rose' is past tense."
+                },
+                {
+                    id: 10,
+                    question: "She sings very ___.",
+                    options: ["good", "well", "best", "better"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Well' is an adverb that modifies the verb 'sings'.",
+                    wrongExplanation: "Incorrect. 'Good' is an adjective, used to describe a noun."
+                },
+                {
+                    id: 11,
+                    question: "He is a good student, ___ he?",
+                    options: ["is", "isn't", "is not", "does"],
+                    correctIndex: 1,
+                    explanation: "Correct. The tag question uses the opposite auxiliary verb from the main statement. The statement is positive ('is'), so the tag is negative ('isn't').",
+                    wrongExplanation: "Incorrect. The tag must be negative. 'Is not' is not the correct short form. 'Does' is not the correct auxiliary verb."
+                },
+                {
+                    id: 12,
+                    question: "Neither of the boys ___ a book.",
+                    options: ["have", "has", "is having", "do have"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Neither' is a singular indefinite pronoun, so it takes a singular verb form ('has').",
+                    wrongExplanation: "Incorrect. 'Have' is a plural verb. 'Is having' and 'do have' are not the correct verb forms here."
+                },
+                {
+                    id: 13,
+                    question: "The team ___ their new uniforms yesterday.",
+                    options: ["wore", "wear", "wears", "was wearing"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Wore' is the simple past tense of 'wear', which is appropriate for an action completed in the past.",
+                    wrongExplanation: "Incorrect. 'Wear' and 'wears' are present tense. 'Was wearing' is past continuous."
+                },
+                {
+                    id: 14,
+                    question: "He ___ for the company for ten years.",
+                    options: ["works", "is working", "has worked", "had worked"],
+                    correctIndex: 2,
+                    explanation: "Correct. The present perfect tense ('has worked') is used to describe an action that started in the past and continues to the present.",
+                    wrongExplanation: "Incorrect. 'Works' and 'is working' are present tenses. 'Had worked' is past perfect, which is for an action before another past action."
+                },
+                {
+                    id: 15,
+                    question: "She is interested ___ learning a new language.",
+                    options: ["on", "in", "at", "for"],
+                    correctIndex: 1,
+                    explanation: "Correct. The preposition 'in' is used after the adjective 'interested'.",
+                    wrongExplanation: "Incorrect. 'On', 'at', and 'for' are not the correct prepositions in this context."
+                },
+                {
+                    id: 16,
+                    question: "I would rather stay home ___ go out tonight.",
+                    options: ["than", "then", "rather than", "but"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Than' is used to introduce the second element in a comparison.",
+                    wrongExplanation: "Incorrect. 'Then' refers to time. 'Rather than' is a phrase, but 'than' is sufficient here. 'But' is a conjunction showing contrast."
+                },
+                {
+                    id: 17,
+                    question: "The teacher told the students ___ be quiet.",
+                    options: ["to", "that", "for", "in order to"],
+                    correctIndex: 0,
+                    explanation: "Correct. The infinitive form 'to be' is used after the verb 'told' to give a command.",
+                    wrongExplanation: "Incorrect. 'That', 'for', and 'in order to' do not fit the grammatical structure of this sentence."
+                },
+                {
+                    id: 18,
+                    question: "The children were playing ___ the yard.",
+                    options: ["at", "in", "on", "into"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'In' is the correct preposition to describe a location enclosed by boundaries.",
+                    wrongExplanation: "Incorrect. 'At' refers to a point, 'on' refers to a surface, and 'into' refers to movement inside."
+                },
+                {
+                    id: 19,
+                    question: "She has been studying for the exam ___ two hours.",
+                    options: ["since", "for", "from", "during"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'For' is used to indicate a duration of time.",
+                    wrongExplanation: "Incorrect. 'Since' is used for a point in time (e.g., 'since 2 o'clock')."
+                },
+                {
+                    id: 20,
+                    question: "___ you finish your work, you can go home.",
+                    options: ["As soon as", "Unless", "While", "Although"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'As soon as' indicates that the second action will happen immediately after the first.",
+                    wrongExplanation: "Incorrect. 'Unless' shows a condition. 'While' shows simultaneous actions. 'Although' shows a contrast."
+                },
+                {
+                    id: 21,
+                    question: "If I ___ a million dollars, I would travel the world.",
+                    options: ["have", "had", "would have", "would had"],
+                    correctIndex: 1,
+                    explanation: "Correct. This is a Type 2 conditional sentence, which uses the simple past tense in the 'if' clause.",
+                    wrongExplanation: "Incorrect. This is a Type 2 conditional sentence, which uses the simple past tense in the 'if' clause. 'Have' is present tense. 'Would have' is for Type 3 conditionals."
+                },
+                {
+                    id: 22,
+                    question: "The news ___ shocking.",
+                    options: ["is", "are", "were", "be"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'News' is an uncountable noun and therefore takes a singular verb.",
+                    wrongExplanation: "Incorrect. 'News' is treated as a singular noun, despite the 's' at the end. It should be followed by a singular verb 'is'."
+                },
+                {
+                    id: 23,
+                    question: "He is a good ___.",
+                    options: ["writer", "write", "writing", "written"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Writer' is the noun form of the verb 'write', and it is the correct word to describe a person who writes.",
+                    wrongExplanation: "Incorrect. 'Write' is a verb. 'Writing' is a gerund or present participle. 'Written' is a past participle."
+                },
+                {
+                    id: 24,
+                    question: "I have ___ been to Paris.",
+                    options: ["never", "ever", "sometimes", "always"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Never' is an adverb of frequency that fits the grammatical structure and common usage in this sentence.",
+                    wrongExplanation: "Incorrect. 'Ever' is typically used in questions. 'Sometimes' and 'always' do not fit the meaning of the sentence."
+                },
+                {
+                    id: 25,
+                    question: "She looked ___ at the beautiful sunset.",
+                    options: ["amazingly", "amazing", "amaze", "amazed"],
+                    correctIndex: 3,
+                    explanation: "Correct. 'Amazed' is a participle adjective describing her feeling. 'Amazingly' is an adverb.",
+                    wrongExplanation: "Incorrect. 'Amazing' is an adjective that describes something that causes awe. The person is 'amazed' by the sunset."
+                },
+                {
+                    id: 26,
+                    question: "The book was written ___ an unknown author.",
+                    options: ["by", "with", "from", "of"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'By' is used to indicate the agent in a passive voice sentence.",
+                    wrongExplanation: "Incorrect. 'With', 'from', and 'of' do not indicate the agent in a passive voice sentence."
+                },
+                {
+                    id: 27,
+                    question: "I ___ a cup of coffee every morning.",
+                    options: ["am having", "have", "had", "will have"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Have' is the simple present tense verb, used to describe a habitual action.",
+                    wrongExplanation: "Incorrect. 'Am having' is present continuous. 'Had' is past tense. 'Will have' is future tense. All are incorrect for a daily habit."
+                },
+                {
+                    id: 28,
+                    question: "The doctor advised me to take a rest, so I ___ to work tomorrow.",
+                    options: ["won't go", "don't go", "didn't go", "won't be going"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Won't go' is the simple future tense, which is used to describe a decision made at the time of speaking.",
+                    wrongExplanation: "Incorrect. 'Don't go' is present tense. 'Didn't go' is past tense. 'Won't be going' is future continuous, which does not fit the context."
+                },
+                {
+                    id: 29,
+                    question: "___ of my friends live near me.",
+                    options: ["Many", "Much", "A lot", "All"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Many' is used with countable nouns like 'friends'.",
+                    wrongExplanation: "Incorrect. 'Much' is used with uncountable nouns."
+                },
+                {
+                    id: 30,
+                    question: "She gave me ___ advice.",
+                    options: ["a", "an", "some", "many"],
+                    correctIndex: 2,
+                    explanation: "Correct. 'Advice' is an uncountable noun and cannot be preceded by 'a' or 'an'. 'Some' is the correct quantifier.",
+                    wrongExplanation: "Incorrect. 'A' and 'an' are used with singular countable nouns. 'Many' is for plural countable nouns."
+                },
+                {
+                    id: 31,
+                    question: "He didn't study for the test, so he failed, ___ he?",
+                    options: ["did", "didn't", "has", "had"],
+                    correctIndex: 0,
+                    explanation: "Correct. The tag question uses the opposite auxiliary verb from the main statement. The statement is negative ('didn't'), so the tag is positive ('did').",
+                    wrongExplanation: "Incorrect. The tag question must be positive. 'Didn't' is not the correct auxiliary verb."
+                },
+                {
+                    id: 32,
+                    question: "I am used to ___ early in the morning.",
+                    options: ["get up", "getting up", "got up", "getted up"],
+                    correctIndex: 1,
+                    explanation: "Correct. After the phrase 'used to', a gerund ('getting up') is used to describe a habit.",
+                    wrongExplanation: "Incorrect. After the phrase 'be used to', the verb form is a gerund ('-ing')."
+                },
+                {
+                    id: 33,
+                    question: "If you heat water, it ___ to a vapor.",
+                    options: ["turned", "will turn", "turns", "would turn"],
+                    correctIndex: 2,
+                    explanation: "Correct. This is a zero conditional sentence, which uses the simple present tense in both the 'if' and 'main' clauses to describe a fact.",
+                    wrongExplanation: "Incorrect. The verb 'turns' is the correct verb form for a scientific fact. 'Will turn' is for a future action. 'Turned' is past tense."
+                },
+                {
+                    id: 34,
+                    question: "The manager, ___ had been working for 20 years, retired last month.",
+                    options: ["who", "which", "whom", "whose"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Who' is used as a relative pronoun for a person.",
+                    wrongExplanation: "Incorrect. 'Which' is used for things. 'Whom' is used for the object of a verb. 'Whose' is for possession."
+                },
+                {
+                    id: 35,
+                    question: "I prefer coffee ___ tea.",
+                    options: ["than", "to", "over", "for"],
+                    correctIndex: 1,
+                    explanation: "Correct. The preposition 'to' is commonly used after the verb 'prefer'.",
+                    wrongExplanation: "Incorrect. 'Than' is used with comparisons with adjectives like 'more'."
+                },
+                {
+                    id: 36,
+                    question: "The play was so good that I wish I ___ seen it.",
+                    options: ["have", "had", "will have", "would have"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Had' is the past perfect tense, used with 'wish' to express a regret about a past action.",
+                    wrongExplanation: "Incorrect. The wish is about a past event, so the past perfect tense 'had seen' is the correct verb form."
+                },
+                {
+                    id: 37,
+                    question: "He is a person ___ I can trust.",
+                    options: ["whom", "who", "which", "that"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Whom' is used as the object of the verb 'trust'.",
+                    wrongExplanation: "Incorrect. 'Who' is the subject of a verb."
+                },
+                {
+                    id: 38,
+                    question: "This is the most ___ movie I have ever seen.",
+                    options: ["interested", "interest", "interesting", "interestingly"],
+                    correctIndex: 2,
+                    explanation: "Correct. 'Interesting' is an adjective that describes a noun.",
+                    wrongExplanation: "Incorrect. 'Interested' is a participle adjective describing a feeling. The movie is 'interesting', not 'interested'."
+                },
+                {
+                    id: 39,
+                    question: "He apologized for ___ so late.",
+                    options: ["arrive", "arriving", "arrived", "to arrive"],
+                    correctIndex: 1,
+                    explanation: "Correct. After a preposition ('for'), a gerund ('arriving') is used.",
+                    wrongExplanation: "Incorrect. Gerunds are used after prepositions."
+                },
+                {
+                    id: 40,
+                    question: "I ___ eat junk food; it's unhealthy.",
+                    options: ["rarely", "often", "always", "sometimes"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Rarely' fits the context of not eating junk food because it is unhealthy.",
+                    wrongExplanation: "Incorrect. The other adverbs do not fit the context of the sentence."
+                },
+                {
+                    id: 41,
+                    question: "The doctor told me to give ___ smoking.",
+                    options: ["off", "up", "away", "in"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Give up' is a phrasal verb that means 'to stop doing something'.",
+                    wrongExplanation: "Incorrect. 'Give off' means to emit something. 'Give away' means to give something for free. 'Give in' means to surrender."
+                },
+                {
+                    id: 42,
+                    question: "___ the rain, we went for a walk.",
+                    options: ["Despite", "Although", "In spite", "However"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Despite' and 'in spite of' are used before a noun phrase.",
+                    wrongExplanation: "Incorrect. 'Although' and 'however' are used with clauses. 'In spite' is not a correct phrase, the correct phrase is 'in spite of'."
+                },
+                {
+                    id: 43,
+                    question: "She is a kind person; ___, she can be very strict.",
+                    options: ["therefore", "however", "consequently", "for instance"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'However' is a transition word used to show a contrast.",
+                    wrongExplanation: "Incorrect. 'Therefore' and 'consequently' are used to show a result. 'For instance' is used to give an example."
+                },
+                {
+                    id: 44,
+                    question: "He told me that he ___ to the concert the previous night.",
+                    options: ["went", "had gone", "has gone", "was going"],
+                    correctIndex: 1,
+                    explanation: "Correct. The past perfect tense ('had gone') is used to describe an action that happened before another past action.",
+                    wrongExplanation: "Incorrect. 'Went' is simple past. The original sentence was 'I went to the concert last night', so in reported speech, the past tense becomes past perfect."
+                },
+                {
+                    id: 45,
+                    question: "If I were you, I ___ that job.",
+                    options: ["will accept", "would accept", "can accept", "should accept"],
+                    correctIndex: 1,
+                    explanation: "Correct. This is a Type 2 conditional sentence, which uses 'would' in the main clause to describe a hypothetical situation.",
+                    wrongExplanation: "Incorrect. 'Will accept' is for a real situation. 'Can' and 'should' do not fit the grammatical structure."
+                },
+                {
+                    id: 46,
+                    question: "She ___ to the party by her friend.",
+                    options: ["was invited", "invited", "invites", "is inviting"],
+                    correctIndex: 0,
+                    explanation: "Correct. This is a passive voice sentence, which uses 'was invited' to show that the subject received the action.",
+                    wrongExplanation: "Incorrect. 'Invited' and 'invites' are active voice. 'Is inviting' is present continuous active voice."
+                },
+                {
+                    id: 47,
+                    question: "We should ___ for the meeting.",
+                    options: ["prepare", "preparing", "to prepare", "prepared"],
+                    correctIndex: 0,
+                    explanation: "Correct. After a modal verb ('should'), the base form of the verb is used.",
+                    wrongExplanation: "Incorrect. 'Preparing' is a gerund. 'To prepare' is an infinitive. 'Prepared' is past tense."
+                },
+                {
+                    id: 48,
+                    question: "He is the person ___ car was stolen.",
+                    options: ["whose", "who", "whom", "which"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Whose' is a possessive relative pronoun that shows ownership.",
+                    wrongExplanation: "Incorrect. 'Who' and 'whom' are for people. 'Which' is for things."
+                },
+                {
+                    id: 49,
+                    question: "I remember ___ that movie before.",
+                    options: ["seeing", "to see", "see", "saw"],
+                    correctIndex: 0,
+                    explanation: "Correct. The verb 'remember' is followed by a gerund ('seeing') when referring to a past memory.",
+                    wrongExplanation: "Incorrect. 'To see' is an infinitive. 'See' and 'saw' are not the correct verb forms."
+                },
+                {
+                    id: 50,
+                    question: "She is afraid ___ spiders.",
+                    options: ["of", "from", "with", "at"],
+                    correctIndex: 0,
+                    explanation: "Correct. The preposition 'of' is used after the adjective 'afraid'.",
+                    wrongExplanation: "Incorrect. The other prepositions do not fit the context."
+                },
+                {
+                    id: 51,
+                    question: "He looks forward to ___ his old friends.",
+                    options: ["see", "seeing", "saw", "to see"],
+                    correctIndex: 1,
+                    explanation: "Correct. The phrase 'look forward to' is followed by a gerund ('seeing').",
+                    wrongExplanation: "Incorrect. The phrase 'look forward to' is a fixed expression that is followed by a gerund, not an infinitive."
+                },
+                {
+                    id: 52,
+                    question: "I wish I ___ play the guitar better.",
+                    options: ["can", "could", "would", "might"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Could' is used after 'wish' to express a desire for something to be different in the present.",
+                    wrongExplanation: "Incorrect. 'Can' is present tense. 'Would' and 'might' do not fit the grammatical structure."
+                },
+                {
+                    id: 53,
+                    question: "The book is so interesting that I can't put it ___.",
+                    options: ["down", "up", "on", "off"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Put down' is a phrasal verb that means 'to stop reading a book'.",
+                    wrongExplanation: "Incorrect. 'Put up' means to tolerate or build. 'Put on' means to wear. 'Put off' means to postpone."
+                },
+                {
+                    id: 54,
+                    question: "She has a talent ___ singing.",
+                    options: ["in", "for", "at", "on"],
+                    correctIndex: 1,
+                    explanation: "Correct. The preposition 'for' is used after the noun 'talent'.",
+                    wrongExplanation: "Incorrect. 'In', 'at', and 'on' are not the correct prepositions in this context."
+                },
+                {
+                    id: 55,
+                    question: "The concert ___ by a famous band.",
+                    options: ["was performed", "performed", "is performing", "had performed"],
+                    correctIndex: 0,
+                    explanation: "Correct. This is a passive voice sentence, which uses 'was performed' to show that the concert was the recipient of the action.",
+                    wrongExplanation: "Incorrect. 'Performed' and 'is performing' are active voice. 'Had performed' is past perfect active voice."
+                },
+                {
+                    id: 56,
+                    question: "I regret ___ him the truth.",
+                    options: ["not telling", "not to tell", "don't tell", "didn't tell"],
+                    correctIndex: 0,
+                    explanation: "Correct. The verb 'regret' is followed by a gerund ('not telling') to express a feeling about a past action.",
+                    wrongExplanation: "Incorrect. The gerund 'not telling' is used after 'regret' to show regret about a past action."
+                },
+                {
+                    id: 57,
+                    question: "The train had already left ___ we arrived at the station.",
+                    options: ["when", "by the time", "while", "as soon as"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'By the time' is a conjunction used with the past perfect tense to show that one action was completed before another past action.",
+                    wrongExplanation: "Incorrect. 'When' is a simple time conjunction. 'While' is for simultaneous actions. 'As soon as' implies one action immediately follows another."
+                },
+                {
+                    id: 58,
+                    question: "He is a man of his word, ___ he?",
+                    options: ["isn't", "is", "doesn't", "does"],
+                    correctIndex: 0,
+                    explanation: "Correct. The tag question uses the opposite auxiliary verb from the main statement. The statement is positive ('is'), so the tag is negative ('isn't').",
+                    wrongExplanation: "Incorrect. The tag question must be negative. 'Is' is positive, so it's incorrect."
+                },
+                {
+                    id: 59,
+                    question: "I would rather you ___ a decision now.",
+                    options: ["make", "made", "will make", "are making"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Would rather' followed by a subject is used to express a preference for someone else's action, and the verb is in the simple past tense.",
+                    wrongExplanation: "Incorrect. The simple past tense 'made' is used after 'would rather' to express a preference for a present or future action by another person."
+                },
+                {
+                    id: 60,
+                    question: "The little boy ran ___ the street without looking.",
+                    options: ["across", "on", "into", "through"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Across' indicates movement from one side of something to the other.",
+                    wrongExplanation: "Incorrect. 'On' indicates a surface. 'Into' indicates entering a space. 'Through' indicates movement within a space."
+                },
+                {
+                    id: 61,
+                    question: "The committee ___ in agreement on the new policy.",
+                    options: ["was", "were", "are", "have been"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Committee' is a collective noun, and when it is acting as a single unit, it takes a singular verb ('was').",
+                    wrongExplanation: "Incorrect. 'Were' and 'are' are plural verbs, and 'have been' is a plural verb form. In this context, the committee acts as a single unit."
+                },
+                {
+                    id: 62,
+                    question: "Not only ___ he rich, but he is also generous.",
+                    options: ["is", "was", "has", "does"],
+                    correctIndex: 0,
+                    explanation: "Correct. When a sentence starts with 'not only', the subject and verb are inverted.",
+                    wrongExplanation: "Incorrect. This is a case of inversion. The verb 'is' comes before the subject 'he'."
+                },
+                {
+                    id: 63,
+                    question: "The movie was so captivating that I couldn't help ___.",
+                    options: ["to cry", "crying", "cry", "cried"],
+                    correctIndex: 1,
+                    explanation: "Correct. The idiom 'can't help' is followed by a gerund ('crying').",
+                    wrongExplanation: "Incorrect. The gerund 'crying' is used after the idiom 'can't help' to mean 'can't stop myself from doing something'."
+                },
+                {
+                    id: 64,
+                    question: "She is a good pianist, but her brother is ___.",
+                    options: ["more good", "better", "best", "more better"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Better' is the comparative form of the adjective 'good'.",
+                    wrongExplanation: "Incorrect. 'More good' and 'more better' are not correct comparative forms. 'Best' is a superlative adjective."
+                },
+                {
+                    id: 65,
+                    question: "He is always ready to help, ___ he?",
+                    options: ["is", "isn't", "has", "doesn't"],
+                    correctIndex: 1,
+                    explanation: "Correct. The tag question uses the opposite auxiliary verb from the main statement. The statement is positive ('is'), so the tag is negative ('isn't').",
+                    wrongExplanation: "Incorrect. The tag question must be negative. 'Is' is positive."
+                },
+                {
+                    id: 66,
+                    question: "She has been working ___ a teacher for ten years.",
+                    options: ["as", "like", "for", "with"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'As' is used to describe a person's role or function.",
+                    wrongExplanation: "Incorrect. 'Like' is used for a comparison."
+                },
+                {
+                    id: 67,
+                    question: "The book is about to be released, ___?",
+                    options: ["isn't it", "is it", "hasn't it", "has it"],
+                    correctIndex: 0,
+                    explanation: "Correct. The tag question uses the opposite auxiliary verb. 'Is about to be released' is positive, so the tag is negative, 'isn't it'.",
+                    wrongExplanation: "Incorrect. The tag question must be negative. 'Is it' and 'has it' are positive. 'Hasn't it' does not fit the auxiliary verb 'is'."
+                },
+                {
+                    id: 68,
+                    question: "The new movie is ___ than the old one.",
+                    options: ["much better", "much good", "more better", "most better"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Much' is used to emphasize a comparative adjective ('better').",
+                    wrongExplanation: "Incorrect. 'Much good' is incorrect. 'More better' and 'most better' are incorrect comparative forms."
+                },
+                {
+                    id: 69,
+                    question: "He is one of the students who ___ the highest marks.",
+                    options: ["has", "have", "is having", "had"],
+                    correctIndex: 1,
+                    explanation: "Correct. The verb 'have' refers to 'students' (plural), not 'one' (singular).",
+                    wrongExplanation: "Incorrect. The relative pronoun 'who' refers to the plural noun 'students', not the singular noun 'one'. Therefore, the verb must be 'have'."
+                },
+                {
+                    id: 70,
+                    question: "It is ___ to see you again.",
+                    options: ["pleased", "pleasing", "please", "pleasure"],
+                    correctIndex: 1,
+                    explanation: "Correct. The adjective 'pleasing' is used to describe the action or event.",
+                    wrongExplanation: "Incorrect. 'Pleased' describes the person's feeling. 'Please' is a verb. 'Pleasure' is a noun."
+                },
+                {
+                    id: 71,
+                    question: "The government has decided to cut ___ on public spending.",
+                    options: ["down", "up", "away", "in"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Cut down on' is a phrasal verb meaning to reduce.",
+                    wrongExplanation: "Incorrect. The other options are incorrect phrasal verbs in this context."
+                },
+                {
+                    id: 72,
+                    question: "The patient was advised to refrain ___ eating sweets.",
+                    options: ["from", "of", "with", "on"],
+                    correctIndex: 0,
+                    explanation: "Correct. The preposition 'from' is used after the verb 'refrain'.",
+                    wrongExplanation: "Incorrect. The other options are incorrect prepositions."
+                },
+                {
+                    id: 73,
+                    question: "He has a habit of ___ his keys.",
+                    options: ["lose", "losing", "lost", "to lose"],
+                    correctIndex: 1,
+                    explanation: "Correct. After the preposition 'of', a gerund ('losing') is used.",
+                    wrongExplanation: "Incorrect. The gerund 'losing' is the correct verb form after the preposition 'of'."
+                },
+                {
+                    id: 74,
+                    question: "The doctor suggested that I ___ more exercise.",
+                    options: ["get", "to get", "getting", "got"],
+                    correctIndex: 0,
+                    explanation: "Correct. The base form of the verb ('get') is used after 'suggested' in the subjunctive mood.",
+                    wrongExplanation: "Incorrect. In the subjunctive mood, the base form of the verb is used regardless of the subject."
+                },
+                {
+                    id: 75,
+                    question: "The company will provide you with ___ training.",
+                    options: ["a", "an", "the", "no article"],
+                    correctIndex: 3,
+                    explanation: "Correct. 'Training' is an uncountable noun, so no article is needed.",
+                    wrongExplanation: "Incorrect. 'A' and 'an' are for countable nouns. 'The' is for specific nouns."
+                },
+                {
+                    id: 76,
+                    question: "The weather is very cold today; ___ a scarf.",
+                    options: ["put on", "put up", "put off", "put in"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Put on' is a phrasal verb that means 'to wear'.",
+                    wrongExplanation: "Incorrect. 'Put up' means to tolerate or build. 'Put off' means to postpone. 'Put in' means to insert."
+                },
+                {
+                    id: 77,
+                    question: "The book is so interesting that I couldn't help ___ a tear.",
+                    options: ["to shed", "shedding", "shed", "shedded"],
+                    correctIndex: 1,
+                    explanation: "Correct. The idiom 'can't help' is followed by a gerund.",
+                    wrongExplanation: "Incorrect. The gerund 'shedding' is the correct verb form after the idiom 'can't help'."
+                },
+                {
+                    id: 78,
+                    question: "I am confident ___ winning the race.",
+                    options: ["in", "of", "about", "at"],
+                    correctIndex: 0,
+                    explanation: "Correct. The preposition 'in' is used after the adjective 'confident'.",
+                    wrongExplanation: "Incorrect. While 'about' can sometimes work, 'in' is the most common preposition used with 'confident'."
+                },
+                {
+                    id: 79,
+                    question: "He speaks English so well ___ I thought he was a native speaker.",
+                    options: ["that", "so that", "such that", "as that"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'So...that' is a common structure to express cause and effect.",
+                    wrongExplanation: "Incorrect. 'So that' is used to show purpose. 'Such that' and 'as that' are not correct grammatical structures here."
+                },
+                {
+                    id: 80,
+                    question: "She is a woman of great beauty, ___ a great intellect.",
+                    options: ["as well as", "as well", "as good as", "as better as"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'As well as' is a compound preposition used to add an extra element.",
+                    wrongExplanation: "Incorrect. 'As well' is an adverb. 'As good as' is a comparison. 'As better as' is incorrect."
+                },
+                {
+                    id: 81,
+                    question: "He is a person ___ I would never trust.",
+                    options: ["whom", "who", "which", "that"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Whom' is the object of the verb 'trust'.",
+                    wrongExplanation: "Incorrect. 'Who' is the subject of a verb."
+                },
+                {
+                    id: 82,
+                    question: "It's high time you ___ your homework.",
+                    options: ["do", "did", "to do", "doing"],
+                    correctIndex: 1,
+                    explanation: "Correct. The phrase 'it's high time' is followed by the simple past tense to express a strong suggestion about a present or future action.",
+                    wrongExplanation: "Incorrect. The simple past tense 'did' is used after 'it's high time'."
+                },
+                {
+                    id: 83,
+                    question: "The more you study, ___ you will learn.",
+                    options: ["more", "most", "the more", "the most"],
+                    correctIndex: 2,
+                    explanation: "Correct. This is a parallel comparative structure, which uses 'the more' to show a proportional relationship.",
+                    wrongExplanation: "Incorrect. 'The more' is the correct parallel comparative phrase."
+                },
+                {
+                    id: 84,
+                    question: "I would rather you ___ the truth.",
+                    options: ["told", "tell", "telling", "to tell"],
+                    correctIndex: 0,
+                    explanation: "Correct. The phrase 'would rather' followed by a subject is followed by the simple past tense verb.",
+                    wrongExplanation: "Incorrect. 'Would rather' followed by a subject takes the simple past verb form to express a preference for a present or future action."
+                },
+                {
+                    id: 85,
+                    question: "The patient has recovered, ___ he?",
+                    options: ["hasn't", "has", "did he", "didn't he"],
+                    correctIndex: 0,
+                    explanation: "Correct. The tag question uses the opposite auxiliary verb from the main statement. 'Has recovered' is positive, so the tag is negative ('hasn't').",
+                    wrongExplanation: "Incorrect. 'Has' is positive. 'Did he' and 'didn't he' are for simple past tenses."
+                },
+                {
+                    id: 86,
+                    question: "Neither of the two roads ___ to the city.",
+                    options: ["lead", "leads", "are leading", "have lead"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Neither' is a singular indefinite pronoun and takes a singular verb form ('leads').",
+                    wrongExplanation: "Incorrect. 'Lead' is a plural verb. 'Are leading' is present continuous. 'Have lead' is present perfect plural."
+                },
+                {
+                    id: 87,
+                    question: "She is a very talented dancer, but ___ a singer.",
+                    options: ["not so good", "not so good as", "not so good as she is", "not so good as"],
+                    correctIndex: 1,
+                    explanation: "Correct. The phrase 'as a singer' completes the comparison.",
+                    wrongExplanation: "Incorrect. 'As' is needed to complete the comparison."
+                },
+                {
+                    id: 88,
+                    question: "The teacher suggested that the students ___ their homework.",
+                    options: ["do", "did", "to do", "doing"],
+                    correctIndex: 0,
+                    explanation: "Correct. The base form of the verb ('do') is used after 'suggested' in the subjunctive mood.",
+                    wrongExplanation: "Incorrect. In the subjunctive mood, the base form of the verb is used regardless of the subject."
+                },
+                {
+                    id: 89,
+                    question: "He is a man ___ I admire.",
+                    options: ["whom", "who", "that", "which"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Whom' is the object of the verb 'admire'.",
+                    wrongExplanation: "Incorrect. 'Who' is the subject of a verb."
+                },
+                {
+                    id: 90,
+                    question: "The book is so interesting that I couldn't help ___ it.",
+                    options: ["to buy", "buying", "buy", "bought"],
+                    correctIndex: 1,
+                    explanation: "Correct. The idiom 'can't help' is followed by a gerund.",
+                    wrongExplanation: "Incorrect. The gerund 'buying' is the correct verb form after the idiom 'can't help'."
+                },
+                {
+                    id: 91,
+                    question: "She is the only one of the students who ___ the answer.",
+                    options: ["know", "knows", "is knowing", "knowing"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Knows' is the correct verb because the relative pronoun 'who' refers to 'one' (singular).",
+                    wrongExplanation: "Incorrect. The relative pronoun 'who' refers to 'one' (singular), not 'students' (plural). Therefore, the verb must be 'knows'."
+                },
+                {
+                    id: 92,
+                    question: "It is essential that he ___ his homework.",
+                    options: ["does", "do", "did", "to do"],
+                    correctIndex: 1,
+                    explanation: "Correct. The base form of the verb ('do') is used after 'it is essential that' in the subjunctive mood.",
+                    wrongExplanation: "Incorrect. In the subjunctive mood, the base form of the verb is used regardless of the subject."
+                },
+                {
+                    id: 93,
+                    question: "The police ___ searching for the stolen car.",
+                    options: ["is", "are", "was", "were"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Police' is a collective noun that is always treated as plural.",
+                    wrongExplanation: "Incorrect. 'Police' is a collective noun that is always treated as plural. The other options are singular verb forms."
+                },
+                {
+                    id: 94,
+                    question: "I have known him ___ I was a child.",
+                    options: ["since", "for", "from", "during"],
+                    correctIndex: 0,
+                    explanation: "Correct. 'Since' is used to indicate a starting point in time.",
+                    wrongExplanation: "Incorrect. 'For' is used for a duration. 'From' and 'during' are not correct in this context."
+                },
+                {
+                    id: 95,
+                    question: "He is a man ___ integrity.",
+                    options: ["of", "with", "by", "for"],
+                    correctIndex: 0,
+                    explanation: "Correct. The preposition 'of' is used to show a quality or characteristic.",
+                    wrongExplanation: "Incorrect. The other options are incorrect prepositions."
+                },
+                {
+                    id: 96,
+                    question: "The teacher made the students ___ the rules.",
+                    options: ["follow", "to follow", "following", "followed"],
+                    correctIndex: 0,
+                    explanation: "Correct. The bare infinitive ('follow') is used after the verb 'make'.",
+                    wrongExplanation: "Incorrect. The verb 'make' is followed by the bare infinitive without 'to'."
+                },
+                {
+                    id: 97,
+                    question: "He is a man ___ a great sense of humor.",
+                    options: ["with", "of", "by", "for"],
+                    correctIndex: 0,
+                    explanation: "Correct. The preposition 'with' is used to show a characteristic or quality.",
+                    wrongExplanation: "Incorrect. The other options are incorrect prepositions."
+                },
+                {
+                    id: 98,
+                    question: "I wish I ___ a doctor.",
+                    options: ["am", "was", "were", "would be"],
+                    correctIndex: 2,
+                    explanation: "Correct. 'Were' is used after 'wish' to express a desire for something to be different in the present.",
+                    wrongExplanation: "Incorrect. 'Was' is technically past tense, but 'were' is the correct subjunctive form after 'wish' for all subjects."
+                },
+                {
+                    id: 99,
+                    question: "She is a very talented singer, but her brother is ___.",
+                    options: ["more bad", "worse", "worst", "more worse"],
+                    correctIndex: 1,
+                    explanation: "Correct. 'Worse' is the comparative form of the adjective 'bad'.",
+                    wrongExplanation: "Incorrect. 'More bad' and 'more worse' are not correct comparative forms. 'Worst' is a superlative adjective."
+                },
+                {
+                    id: 100,
+                    question: "The more I learn, ___ I realize how much I don't know.",
+                    options: ["the more", "the most", "more", "most"],
+                    correctIndex: 0,
+                    explanation: "Correct. This is a parallel comparative structure, which uses 'the more' to show a proportional relationship.",
+                    wrongExplanation: "Incorrect. 'The more' is the correct parallel comparative phrase."
+                }
+            ];
+
+            // --- DOM Elements ---
+            const nameModal = document.getElementById('name-modal');
+            const nameForm = document.getElementById('name-form');
+            const userNameInput = document.getElementById('user-name-input');
+            const quizScreen = document.getElementById('quiz-screen');
+            const questionsContainer = document.getElementById('questions-container');
+            const timerDisplay = document.getElementById('timer-display');
+            const statusDisplay = document.getElementById('status-display');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            const submitButton = document.getElementById('submit-button');
+            const resultsScreen = document.getElementById('results-screen');
+            const resultName = document.getElementById('result-name');
+            const resultScore = document.getElementById('result-score');
+            const allQuestionsResults = document.getElementById('all-questions-results');
+            const downloadButton = document.getElementById('download-button');
+            const printButton = document.getElementById('print-button');
+            const downloadCardRenderContainer = document.getElementById('download-card-render-container');
+            const cardName = document.getElementById('card-name');
+            const cardScore = document.getElementById('card-score');
+            const cardDate = document.getElementById('card-date');
+            const popupModal = document.getElementById('popup-modal');
+            const popupCloseButton = document.getElementById('popup-close-button');
+            const ariaLiveFeedback = document.getElementById('aria-live-feedback');
+
+            // --- State Variables ---
+            let quizState = {
+                userName: '',
+                answers: {},
+                attemptedCount: 0,
+                timerInterval: null,
+                currentQuestionIndex: 0
+            };
+            const totalQuestions = quizData.length;
+            const timerMinutes = totalQuestions;
+
+            // --- Functions ---
+            const updateStatus = () => {
+                quizState.attemptedCount = Object.keys(quizState.answers).length;
+                statusDisplay.textContent = `Total Questions: ${totalQuestions} | Attempted: ${quizState.attemptedCount}`;
+                if (quizState.attemptedCount === totalQuestions) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Submit (All Questions Attempted)";
+                } else {
+                    submitButton.disabled = true;
+                    submitButton.textContent = "Submit";
+                }
+            };
+
+            const renderQuiz = () => {
+                questionsContainer.innerHTML = '';
+                const q = quizData[quizState.currentQuestionIndex];
+                
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                questionCard.id = `q-${q.id}-card`;
+
+                let optionsHtml = q.options.map((option, index) => `
+                    <label for="q-${q.id}-option-${index}" class="option-label">
+                        <input type="radio" id="q-${q.id}-option-${index}" name="question-${q.id}" value="${index}" ${quizState.answers[q.id] !== undefined ? 'disabled' : ''} ${quizState.answers[q.id] === index ? 'checked' : ''}>
+                        ${option}
+                    </label>
+                `).join('');
+
+                questionCard.innerHTML = `
+                    <h3 class="text-xl mb-2">Question ${q.id}: ${q.question}</h3>
+                    <div class="space-y-2">
+                        ${optionsHtml}
+                    </div>
+                    <div id="feedback-${q.id}" class="mt-4 text-sm ${quizState.answers[q.id] === undefined ? 'hidden' : ''}"></div>
+                `;
+                questionsContainer.appendChild(questionCard);
+
+                // Re-apply feedback if already answered
+                if (quizState.answers[q.id] !== undefined) {
+                    handleAnswerSelection(q.id, quizState.answers[q.id], false);
+                }
+
+                updateNavigationButtons();
+            };
+
+            const updateNavigationButtons = () => {
+                // Previous button visibility
+                if (quizState.currentQuestionIndex === 0) {
+                    prevButton.classList.add('hidden');
+                } else {
+                    prevButton.classList.remove('hidden');
+                }
+
+                // Next button visibility
+                if (quizState.currentQuestionIndex === totalQuestions - 1) {
+                    nextButton.classList.add('hidden');
+                    submitButton.classList.remove('hidden');
+                } else {
+                    nextButton.classList.remove('hidden');
+                    submitButton.classList.add('hidden');
+                }
+            };
+
+            const handleAnswerSelection = (questionId, selectedIndex, isNewSelection = true) => {
+                if (isNewSelection && quizState.answers[questionId] !== undefined) {
+                    // Answer already selected, do nothing
+                    return;
+                }
+                
+                if (isNewSelection) {
+                    quizState.answers[questionId] = selectedIndex;
+                    updateStatus();
+                }
+
+                const question = quizData.find(q => q.id === questionId);
+                const feedbackDiv = document.getElementById(`feedback-${questionId}`);
+                const options = document.querySelectorAll(`input[name="question-${questionId}"]`);
+                const selectedOptionLabel = document.querySelector(`label[for="q-${questionId}-option-${selectedIndex}"]`);
+                const correctOptionLabel = document.querySelector(`label[for="q-${questionId}-option-${question.correctIndex}"]`);
+
+                options.forEach(option => option.disabled = true);
+
+                feedbackDiv.classList.remove('hidden');
+
+                if (selectedIndex === question.correctIndex) {
+                    selectedOptionLabel.classList.add('correct-answer-label');
+                    feedbackDiv.innerHTML = `<span class="font-bold text-green-700">Correct!</span> — Reason: ${question.explanation}`;
+                    ariaLiveFeedback.textContent = `Question ${questionId} is correct.`;
+                } else {
+                    selectedOptionLabel.classList.add('incorrect-answer-label');
+                    if (correctOptionLabel) {
+                         correctOptionLabel.classList.add('correct-answer-label');
+                    }
+                    feedbackDiv.innerHTML = `
+                        <span class="font-bold text-red-700">Incorrect.</span> <br>
+                        ${question.wrongExplanation} <br>
+                        <span class="font-bold text-green-700 mt-2 block">The correct answer was: ${question.options[question.correctIndex]}</span>
+                        <div class="mt-1 text-xs text-gray-600">
+                             Reason: ${question.explanation}
+                        </div>
+                    `;
+                    ariaLiveFeedback.textContent = `Question ${questionId} is incorrect. The correct answer was ${question.options[question.correctIndex]}.`;
+                }
+            };
+
+            const startTimer = () => {
+                let timeRemaining = timerMinutes * 60;
+                const endTime = Date.now() + timeRemaining * 1000;
+
+                quizState.timerInterval = setInterval(() => {
+                    const now = Date.now();
+                    timeRemaining = Math.max(0, Math.floor((endTime - now) / 1000));
+                    
+                    const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+                    const seconds = (timeRemaining % 60).toString().padStart(2, '0');
+                    timerDisplay.textContent = `${minutes}:${seconds}`;
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(quizState.timerInterval);
+                        submitQuiz();
+                    }
+                }, 1000);
+            };
+
+            const submitQuiz = () => {
+                clearInterval(quizState.timerInterval);
+                quizScreen.classList.add('hidden');
+                resultsScreen.classList.remove('hidden');
+                renderResults();
+            };
+
+            const showPopup = () => {
+                popupModal.classList.remove('hidden');
+            };
+
+            const renderResults = () => {
+                let score = 0;
+                allQuestionsResults.innerHTML = '';
+
+                quizData.forEach(q => {
+                    const userAnswer = quizState.answers[q.id];
+                    const isCorrect = userAnswer === q.correctIndex;
+                    if (isCorrect) score++;
+
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'question-card mb-4';
+                    
+                    let optionsHtml = q.options.map((option, index) => {
+                        let classes = 'option-label';
+                        if (index === q.correctIndex) {
+                            classes += ' correct-answer-label';
+                        }
+                        if (index === userAnswer && index !== q.correctIndex) {
+                            classes += ' incorrect-answer-label';
+                        }
+                        return `
+                            <div class="${classes}">
+                                ${option}
+                            </div>
+                        `;
+                    }).join('');
+
+                    const feedbackHtml = isCorrect ? 
+                        `<span class="font-bold text-green-700">You answered correctly!</span>` :
+                        `<span class="font-bold text-red-700">You answered incorrectly.</span>`;
+
+                    resultCard.innerHTML = `
+                        <h3 class="text-xl mb-2">Question ${q.id}: ${q.question}</h3>
+                        <div class="text-lg font-semibold mb-2">${feedbackHtml}</div>
+                        <div class="space-y-2">
+                            ${optionsHtml}
+                        </div>
+                        <div class="mt-4 text-sm text-gray-700">
+                           <span class="font-bold">Explanation:</span> ${isCorrect ? q.explanation : q.wrongExplanation + ' ' + q.explanation}
+                        </div>
+                    `;
+                    allQuestionsResults.appendChild(resultCard);
+                });
+
+                const percentage = totalQuestions > 0 ? ((score / totalQuestions) * 100).toFixed(2) : 0;
+                resultName.textContent = quizState.userName;
+                resultScore.textContent = `${score} / ${totalQuestions} (${percentage}%)`;
+
+                // Set data for the download card
+                cardName.textContent = quizState.userName;
+                cardScore.textContent = `${score} / ${totalQuestions}`;
+                const now = new Date();
+                const dateString = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                cardDate.textContent = `Date: ${dateString} | Time: ${timeString}`;
+            };
+
+            const downloadResultCard = () => {
+                downloadCardRenderContainer.classList.remove('hidden');
+                const element = document.getElementById('download-card');
+                html2canvas(element, {
+                    scale: 2 // Higher resolution for better quality
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    const date = new Date();
+                    const formattedDate = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}`;
+                    link.download = `Result_${quizState.userName.replace(/ /g, '_')}_${formattedDate}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    downloadCardRenderContainer.classList.add('hidden');
+                });
+            };
+
+            // --- Event Listeners ---
+            nameForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                quizState.userName = userNameInput.value.trim();
+                if (quizState.userName) {
+                    nameModal.classList.add('hidden');
+                    quizScreen.classList.remove('hidden');
+                    renderQuiz();
+                    startTimer();
+                }
+            });
+
+            questionsContainer.addEventListener('change', (e) => {
+                if (e.target.type === 'radio' && e.target.name.startsWith('question')) {
+                    const questionId = parseInt(e.target.name.split('-')[1]);
+                    const selectedIndex = parseInt(e.target.value);
+                    handleAnswerSelection(questionId, selectedIndex);
+                }
+            });
+
+            nextButton.addEventListener('click', () => {
+                if (quizState.currentQuestionIndex < totalQuestions - 1) {
+                    quizState.currentQuestionIndex++;
+                    renderQuiz();
+                }
+            });
+
+            prevButton.addEventListener('click', () => {
+                if (quizState.currentQuestionIndex > 0) {
+                    quizState.currentQuestionIndex--;
+                    renderQuiz();
+                }
+            });
+
+            submitButton.addEventListener('click', () => {
+                if (quizState.attemptedCount < totalQuestions) {
+                    showPopup();
+                } else {
+                    submitQuiz();
+                }
+            });
+
+            popupCloseButton.addEventListener('click', () => {
+                popupModal.classList.add('hidden');
+            });
+
+            downloadButton.addEventListener('click', downloadResultCard);
+            
+            // New print button functionality
+            printButton.addEventListener('click', () => {
+                window.print();
+            });
+        });
+    </script>
+
+</body>
+</html>
